@@ -4,13 +4,20 @@
   "description": "",
   "license": "ISC",
   "author": "Osin",
-  "type": "commonjs",
   "main": "index.js",
+  "type": "module",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "dev": "nodemon src/app.js",
+    "start": "node src/app.js",
+    "prod": "pm2 src/app.js"
   },
   "dependencies": {
+    "bcrypt": "^6.0.0",
+    "cors": "^2.8.6",
     "express": "^5.2.1",
-    "mongoose": "^9.7.1"
+    "http-status": "^2.1.0",
+    "mongoose": "^9.7.3",
+    "nodemon": "^3.1.14",
+    "socket.io": "^4.8.3"
   }
 }
