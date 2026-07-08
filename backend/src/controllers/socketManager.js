@@ -5,7 +5,14 @@ let messages = {}
 let timeOnline = {}
 
 export const connectTosocket = (server) => {
-    const io = new Server(server);
+    const io = new Server(server, {                 //cors origin error
+        cors: {                                     //we shouldn't do this in production this is only for testing
+            origin: "*",
+            methods: ["GET", "POST"],
+            allowedHeaders: ["*"],
+            credentials: true
+        }
+    });
 
     io.on("connection", (socket) => {
         socket.on("join-call", (path) => {
