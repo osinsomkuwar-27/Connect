@@ -3,13 +3,13 @@ import Avatar from '@mui/material/Avatar';
 import Button from '@mui/material/Button';
 import CssBaseline from '@mui/material/CssBaseline';
 import TextField from '@mui/material/TextField';
-import FormControlLabel from '@mui/material/FormControlLabel';
-import Checkbox from '@mui/material/Checkbox';
 import Paper from '@mui/material/Paper';
 import Box from '@mui/material/Box';
 import Grid from '@mui/material/Grid';
 import LockOutlinedIcon from '@mui/icons-material/LockOutlined';
 import { createTheme, ThemeProvider } from '@mui/material/styles';
+import { AuthContext } from '../contexts/AuthContext';
+import { Snackbar } from '@mui/material';
 
 // TODO remove, this demo shouldn't need to reset the theme.
 
@@ -18,13 +18,32 @@ const defaultTheme = createTheme();
 export default function Authentication() {
 
     const [username, setUsername] = React.useState();
-    const [passowrd, setPassword] = React.useState();
+    const [password, setPassword] = React.useState();
     const [name, setName] = React.useState();
     const [error, setError] = React.useState();
-    const [messages, setMessages] = React.useState();
+    const [message, setMessage] = React.useState();
 
     const [formState, setformState] = React.useState(0);
     const [open, setOpen] = React.useState(false);
+
+    const {handleRegister, handleLogin} = React.useContext(AuthContext);
+
+    let handleAuth = async() => {
+        try{
+            if(formState === 0){
+
+            }
+            if(formState === 1){
+                let result = await handleRegister(name, username, password);
+                console.log(result);
+                setMessage(result);
+                setOpen(true);
+            }
+        }catch(err){
+            console.log(err);
+            setError(err.response?.data?.message || err.message);
+        }
+    }
 
   return (
     <ThemeProvider theme={defaultTheme}>
@@ -98,22 +117,29 @@ export default function Authentication() {
                 autoComplete="current-password"
                 onChange={(e) => setPassword(e.target.value)}
               />
-              <FormControlLabel
-                control={<Checkbox value="remember" color="primary" />}
-                label="Remember me"
-              />
+
+              <p style={{color: "red"}}>{error}</p>
+
               <Button
                 type="button"
                 fullWidth
                 variant="contained"
                 sx={{ mt: 3, mb: 2 }}
+                onClick={handleAuth}
               >
-                Sign In
+                {formState === 0 ? "Login" : "Register"}
               </Button>
             </Box>
           </Box>
         </Grid>
       </Grid>
+
+                           <Snackbar
+                           open = {open}
+                           autoHideDuration={4000}
+                           message={message}
+                           />
+
     </ThemeProvider>
   );
 }
