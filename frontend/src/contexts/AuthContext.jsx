@@ -8,7 +8,7 @@ import { useNavigate } from "react-router-dom";
 export const AuthContext = createContext({});
 
 const client = axios.create({
-    // baseURL: `https://special-garbanzo-v65q4gg7pvr7cp597-8000.app.github.dev/api/v1/users`
+    baseURL: "http://localhost:8000/api/v1/users"
 })
 
 

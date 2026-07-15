@@ -13,11 +13,17 @@ const login = async (req , res) => {
         if(!user){
             return res.status(httpStatus.NOT_FOUND).json({message: "User Not Found"})
         }
-        if(bcrypt.compare(password, user.password)){
+
+        let isPasswordCorrect = await bcrypt.compare(password, user.password)
+
+
+        if(isPasswordCorrect){
             let token = crypto.randomBytes(20).toString("hex");
             user.token = token;
             await user.save();
             return res.status(httpStatus.OK).json({token: token})
+        }else{
+            return res.status(httpStatus.UNAUTHORIZED).json({message: "Invalid Credentials"})
         }
     }
     catch(e){
@@ -32,7 +38,7 @@ const register = async(req , res) =>{
     try{
         const existingUser = await User.findOne({username});
         if(existingUser){
-            return res.status(httpStatus.FOUND).json({messgae: "User already exists"});
+            return res.status(httpStatus.FOUND).json({message: "User already exists"});
         }
 
         const hashedPassword = await bcrypt.hash(password, 10);

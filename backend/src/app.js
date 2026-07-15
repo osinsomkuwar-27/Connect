@@ -2,6 +2,9 @@ import express from "express";
 import {createServer} from "node:http";
 import dotenv from "dotenv";
 
+import dns from "node:dns";
+dns.setServers(["8.8.8.8", "8.8.4.4"]);
+
 import {Server} from "socket.io";
 import mongoose from "mongoose";
 import { connectTosocket } from "./controllers/socketManager.js";
@@ -27,5 +30,8 @@ const start = async () =>{
         console.log("LISTENING ON PORT 8000");
     });
 };
+
+console.log("Mongo URI:", process.env.MONGODB_URI);
+console.log("PORT:", process.env.PORT);
 
 start();
