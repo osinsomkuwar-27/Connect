@@ -6,7 +6,7 @@
 
 .meetUserVideo {
     position: absolute;
-    right: 24px;
+    left: 24px;
     bottom: 84px;
     width: min(280px, 28vw);
     aspect-ratio: 16 / 9;
