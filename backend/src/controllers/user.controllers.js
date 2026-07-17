@@ -53,7 +53,7 @@ const register = async(req , res) =>{
 
         res.status(httpStatus.CREATED).json({message: "User Registered"});
     }catch (e){
-        res.json({message: `Something went wrong ${e}`});
+        res.status(500).json({message: `Something went wrong ${e}`});
     }
 }
 
@@ -61,13 +61,30 @@ const getUserHistory = async (req, res) => {
     const { token } = req.query;
 
     try {
-        const user = await User.findOne({ token: token });
-        const meetings = await Meeting.find({ user_id: user.username })
-        res.json(meetings)
+        const user = await User.findOne({ token });
+
+        if (!user) {
+            return res.status(404).json({
+                message: "User not found"
+            });
+        }
+
+        const meetings = await Meeting.find({
+            user_id: user.username
+        });
+
+        return res.status(200).json(meetings);
+
     } catch (e) {
-        res.json({ message: `Something went wrong ${e}` })
+        return res.status(500).json({
+            message: `Something went wrong ${e}`
+        });
+
+        return res.status(500).json({
+            message: `Something went wrong ${e}`
+        });
     }
-}
+};
 
 const addToHistory = async (req, res) => {
     const { token, meeting_code } = req.body;
@@ -84,7 +101,7 @@ const addToHistory = async (req, res) => {
 
         res.status(httpStatus.CREATED).json({ message: "Added code to history" })
     } catch (e) {
-        res.json({ message: `Something went wrong ${e}` })
+        res.status(500).json({ message: `Something went wrong ${e}` })
     }
 }
 
