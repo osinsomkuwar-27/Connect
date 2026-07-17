@@ -44,27 +44,37 @@ export const connectTosocket = (server) => {
         })
 
         socket.on("chat-message", (data, sender) => {
-            const [matchingRoom, found] = Object.entries(connections)
-                .reduce(([room, isFound], [roomKey, roomValue]) => {
-                    if(!isFound && roomValue.includes(socket.id)){
-                        return [roomKey, true];
-                    }
-                    return [room, isFound];
-                }, ['', false]);
-
-            if(found === true){
-                if(messages[matchingRoom] === undefined){
-                    messages[matchingRoom] = []
-                }
-
-                messages[matchingRoom].push({'sender': sender, "data": data, "socket-id-sender": socket.id})
-                console.log("message", KeyboardEvent, ":", sender, data)
-
-                connections[matchingRoom].forEach((elem) => {
-                    io.to(elem).emit("chat-message", data, sender, socket.id)
-                })
+    const [matchingRoom, found] = Object.entries(connections)
+        .reduce(([room, isFound], [roomKey, roomValue]) => {
+            if (!isFound && roomValue.includes(socket.id)) {
+                return [roomKey, true];
             }
-        })
+            return [room, isFound];
+        }, ["", false]);
+
+    if (found === true) {
+        if (messages[matchingRoom] === undefined) {
+            messages[matchingRoom] = [];
+        }
+
+        messages[matchingRoom].push({
+            sender: sender,
+            data: data,
+            "socket-id-sender": socket.id
+        });
+
+        console.log("message:", sender, data);
+
+        connections[matchingRoom].forEach((elem) => {
+            io.to(elem).emit(
+                "chat-message",
+                data,
+                sender,
+                socket.id
+            );
+        });
+    }
+});
 
         socket.on("disconnect", () => {
             var diffTime = Math.abs(timeOnline[socket.id] - new Date())
