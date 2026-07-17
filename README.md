@@ -98,3 +98,10 @@ A JWT consists of three parts:
 Header – Contains metadata about the token (e.g., signing algorithm)
 Payload – Contains the actual data (e.g., user information)
 Signature – Used to verify the authenticity of the token
+
+STUN servers are lightweight servers running on the public internet which return the IP adress of the requester's device.
+
+The Navigator interface represents the state and the identity of the user agent. It allows scripts to query it and to register themselves to carry on some activities.
+A Navigator object can be retrieved using the read-only window.navigator property.
+
+The mediaDevices read-only property of the Navigator interface returns a MediaDevices object, which provides access to connected media input devices like cameras and microphones, as well as screen sharing.
