@@ -34,13 +34,13 @@ export default function VideoMeetComponent() {
 
     let [audioAvailable, setAudioAvailable] = useState(true);
 
-    let [video, setVideo] = useState([]);
+    let [video, setVideo] = useState(true);
 
-    let [audio, setAudio] = useState();
+    let [audio, setAudio] = useState(true);
 
     let [screen, setScreen] = useState();
 
-    let [showModal, setModal] = useState(true);
+    let [showModal, setModal] = useState(false);
 
     let [screenAvailable, setScreenAvailable] = useState();
 
@@ -68,7 +68,13 @@ export default function VideoMeetComponent() {
         console.log("HELLO")
         getPermissions();
 
-    })
+    }, [])
+
+    useEffect(() => {
+        if (!askForUsername && localVideoref.current && window.localStream) {
+            localVideoref.current.srcObject = window.localStream;
+        }
+    }, [askForUsername])
 
     let getDislayMedia = () => {
         if (screen) {
@@ -83,23 +89,19 @@ export default function VideoMeetComponent() {
 
     const getPermissions = async () => {
         try {
-            const videoPermission = await navigator.mediaDevices.getUserMedia({ video: true });
-            if (videoPermission) {
-                setVideoAvailable(true);
-                console.log('Video permission granted');
-            } else {
-                setVideoAvailable(false);
-                console.log('Video permission denied');
+            if (!navigator.mediaDevices?.getUserMedia) {
+                setScreenAvailable(false);
+                return;
             }
 
-            const audioPermission = await navigator.mediaDevices.getUserMedia({ audio: true });
-            if (audioPermission) {
-                setAudioAvailable(true);
-                console.log('Audio permission granted');
-            } else {
-                setAudioAvailable(false);
-                console.log('Audio permission denied');
-            }
+            const userMediaStream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
+            const hasVideoTrack = userMediaStream.getVideoTracks().length > 0;
+            const hasAudioTrack = userMediaStream.getAudioTracks().length > 0;
+
+            setVideoAvailable(hasVideoTrack);
+            setAudioAvailable(hasAudioTrack);
+            setVideo(hasVideoTrack);
+            setAudio(hasAudioTrack);
 
             if (navigator.mediaDevices.getDisplayMedia) {
                 setScreenAvailable(true);
@@ -107,29 +109,18 @@ export default function VideoMeetComponent() {
                 setScreenAvailable(false);
             }
 
-            if (videoAvailable || audioAvailable) {
-                const userMediaStream = await navigator.mediaDevices.getUserMedia({ video: videoAvailable, audio: audioAvailable });
-                if (userMediaStream) {
-                    window.localStream = userMediaStream;
-                    if (localVideoref.current) {
-                        localVideoref.current.srcObject = userMediaStream;
-                    }
-                }
+            window.localStream = userMediaStream;
+            if (localVideoref.current) {
+                localVideoref.current.srcObject = userMediaStream;
             }
         } catch (error) {
+            setVideoAvailable(false);
+            setAudioAvailable(false);
+            setVideo(false);
+            setAudio(false);
             console.log(error);
         }
     };
-
-    useEffect(() => {
-        if (video !== undefined && audio !== undefined) {
-            getUserMedia();
-            console.log("SET STATE HAS ", video, audio);
-
-        }
-
-
-    }, [video, audio])
     let getMedia = () => {
         setVideo(videoAvailable);
         setAudio(audioAvailable);
@@ -382,13 +373,28 @@ export default function VideoMeetComponent() {
         return Object.assign(stream.getVideoTracks()[0], { enabled: false })
     }
 
+    let toggleTrackEnabled = (kind, enabled) => {
+        if (!window.localStream) return;
+
+        const track = window.localStream.getTracks().find((currentTrack) => currentTrack.kind === kind);
+        if (!track) return;
+
+        track.enabled = enabled;
+    }
+
     let handleVideo = () => {
-        setVideo(!video);
-        // getUserMedia();
+        setVideo((prevVideo) => {
+            const nextVideoState = !prevVideo;
+            toggleTrackEnabled('video', nextVideoState);
+            return nextVideoState;
+        });
     }
     let handleAudio = () => {
-        setAudio(!audio)
-        // getUserMedia();
+        setAudio((prevAudio) => {
+            const nextAudioState = !prevAudio;
+            toggleTrackEnabled('audio', nextAudioState);
+            return nextAudioState;
+        })
     }
 
     useEffect(() => {
@@ -460,7 +466,7 @@ export default function VideoMeetComponent() {
 
 
                     <div>
-                        <video ref={localVideoref} autoPlay muted></video>
+                        <video ref={localVideoref} autoPlay muted playsInline></video>
                     </div>
 
                 </div> :
@@ -523,7 +529,7 @@ export default function VideoMeetComponent() {
                     </div>
 
 
-                    <video className={styles.meetUserVideo} ref={localVideoref} autoPlay muted></video>
+                    <video className={styles.meetUserVideo} ref={localVideoref} autoPlay muted playsInline></video>
 
                     <div className={styles.conferenceView}>
                         {videos.map((video) => (
