@@ -6,6 +6,6 @@ const meetingSchema = new Schema({
     date: {type:Date, default: Date.now, required : true},
 });
 
-const user = mongoose.model("Meeting", meetingScheme);
+const meeting = mongoose.model("Meeting", meetingSchema);
 
-export {Meeting};
+export {meeting as Meeting};
