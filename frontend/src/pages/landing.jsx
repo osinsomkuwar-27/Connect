@@ -35,12 +35,14 @@ export default function LandingPage() {
                         router("/auth")
                         setNavOpen(false)
                     }}>Register</p>
-                    <div onClick={() => {
-                        router("/auth")
-                        setNavOpen(false)
-                    }} role='button'>
-                        <p>Login</p>
-                    </div>
+                    <p
+                        onClick={() => {
+                            router("/auth");
+                            setNavOpen(false);
+                        }}
+                    >
+                        Login
+                    </p>
                 </div>
             </nav>
 

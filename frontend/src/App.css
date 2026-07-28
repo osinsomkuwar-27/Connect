@@ -41,7 +41,7 @@
   flex-wrap: wrap;
 }
 
-.landingPageContainer nav .navlist>div>p,
+.landingPageContainer nav .navlist p,
 .landingPageContainer nav .navlist div[role='button'] p {
   font-size: clamp(0.85rem, 1.8vw, 1rem);
   white-space: nowrap;
