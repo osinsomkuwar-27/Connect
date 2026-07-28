@@ -41,7 +41,7 @@
   flex-wrap: wrap;
 }
 
-.landingPageContainer nav .navlist p,
+.landingPageContainer nav .navlist>div>p,
 .landingPageContainer nav .navlist div[role='button'] p {
   font-size: clamp(0.85rem, 1.8vw, 1rem);
   white-space: nowrap;
@@ -83,24 +83,24 @@
 }
 
 /* TEXT COLUMN */
-.landingMainContainer > div:nth-child(1) {
+.landingMainContainer>div:nth-child(1) {
   font-size: clamp(1.2rem, 3.5vw, 2.2rem);
   flex: 1 1 300px;
   min-width: 0;
 }
 
-.landingMainContainer > div:nth-child(1) h1 {
+.landingMainContainer>div:nth-child(1) h1 {
   font-size: clamp(1.5rem, 4.5vw, 2.8rem);
   line-height: 1.2;
   word-break: break-word;
 }
 
-.landingMainContainer > div:nth-child(1) p {
+.landingMainContainer>div:nth-child(1) p {
   font-size: clamp(0.9rem, 2vw, 1.2rem);
   margin-top: 0.75rem;
 }
 
-.landingMainContainer > div:nth-child(1) div[role='button'] {
+.landingMainContainer>div:nth-child(1) div[role='button'] {
   background: #D97500;
   width: fit-content;
   padding: clamp(0.6rem, 1.5vw, 1rem) clamp(1rem, 2.5vw, 1.6rem);
@@ -108,7 +108,7 @@
   margin-top: clamp(1rem, 2.5vw, 1.9rem);
 }
 
-.landingMainContainer > div:nth-child(1) div[role='button'] a {
+.landingMainContainer>div:nth-child(1) div[role='button'] a {
   text-decoration: none;
   color: white;
   font-size: clamp(1rem, 2.5vw, 1.7rem);
@@ -116,14 +116,14 @@
 }
 
 /* IMAGE COLUMN */
-.landingMainContainer > div:nth-child(2) {
+.landingMainContainer>div:nth-child(2) {
   flex: 0 1 auto;
   display: flex;
   align-items: center;
   justify-content: center;
 }
 
-.landingMainContainer > div:nth-child(2) img {
+.landingMainContainer>div:nth-child(2) img {
   height: clamp(200px, 50vh, 70vh);
   width: auto;
   max-width: 100%;
@@ -144,7 +144,7 @@
   border-bottom: 1px solid rgba(0, 0, 0, 0.08);
 }
 
-.navBar > div {
+.navBar>div {
   display: flex;
   align-items: center;
   gap: 0.25rem;
@@ -171,7 +171,7 @@
   justify-content: center;
 }
 
-.leftPanel > div {
+.leftPanel>div {
   width: 100%;
 }
 
@@ -200,7 +200,7 @@
   justify-content: center;
 }
 
-.rightPanel > img {
+.rightPanel>img {
   width: clamp(160px, 28vw, 380px);
   height: auto;
   border-radius: 16px;
@@ -242,16 +242,18 @@
   .landingMainContainer {
     padding-inline: clamp(1.5rem, 4vw, 3rem);
   }
-  .rightPanel > img {
+
+  .rightPanel>img {
     width: clamp(140px, 25vw, 320px);
   }
 }
 
 /* ≤992px — tablet landscape */
 @media (max-width: 992px) {
-  .landingMainContainer > div:nth-child(2) img {
+  .landingMainContainer>div:nth-child(2) img {
     height: clamp(180px, 40vh, 55vh);
   }
+
   .meetContainer {
     gap: clamp(1rem, 3vw, 3rem);
   }
@@ -259,6 +261,7 @@
 
 /* ≤768px — tablet portrait & large phones */
 @media (max-width: 768px) {
+
   /* Landing — stack hero vertically */
   .landingMainContainer {
     flex-direction: column;
@@ -268,12 +271,12 @@
     text-align: left;
   }
 
-  .landingMainContainer > div:nth-child(2) {
+  .landingMainContainer>div:nth-child(2) {
     width: 100%;
     justify-content: center;
   }
 
-  .landingMainContainer > div:nth-child(2) img {
+  .landingMainContainer>div:nth-child(2) img {
     height: auto;
     width: clamp(200px, 70vw, 360px);
     margin: 0 auto;
@@ -297,13 +300,14 @@
     justify-content: center;
   }
 
-  .rightPanel > img {
+  .rightPanel>img {
     width: clamp(200px, 60vw, 320px);
   }
 }
 
 /* ≤576px — small phones */
 @media (max-width: 576px) {
+
   /* Hamburger nav on landing */
   .navToggle {
     display: flex;
@@ -328,13 +332,13 @@
     gap: 1.5rem;
   }
 
-  .landingMainContainer > div:nth-child(1) div[role='button'] {
+  .landingMainContainer>div:nth-child(1) div[role='button'] {
     width: 100%;
     text-align: center;
     border-radius: 12px;
   }
 
-  .landingMainContainer > div:nth-child(1) div[role='button'] a {
+  .landingMainContainer>div:nth-child(1) div[role='button'] a {
     font-size: 1.1rem;
   }
 
@@ -368,11 +372,11 @@
 
 /* ≤480px — small phones */
 @media (max-width: 480px) {
-  .landingMainContainer > div:nth-child(2) img {
+  .landingMainContainer>div:nth-child(2) img {
     width: 90vw;
   }
 
-  .rightPanel > img {
+  .rightPanel>img {
     width: 80vw;
   }
 }
@@ -383,7 +387,7 @@
     font-size: 1.1rem;
   }
 
-  .landingMainContainer > div:nth-child(1) h1 {
+  .landingMainContainer>div:nth-child(1) h1 {
     font-size: 1.3rem;
   }
 }
