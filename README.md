@@ -1,107 +1,211 @@
 # Connect
 
-Technologies Used:
-Database: MongoDB
-Backend: Bcrypt, Crypto, Socket, Express.js
-Frontend: React, MaterialUI, WebRTC, AXIOS, CSS
+Connect is a real-time video calling and messaging web application built with WebRTC for peer-to-peer media streaming, Socket.io for signaling, and a secure token-based authentication system.
 
-What is CORS?
-CORS (Cross-Origin Resource Sharing) is a security feature implemented by web browsers to control how web applications can request resources from different origins (domains).
+---
 
-The primary purpose of CORS is to prevent malicious websites from making unauthorized requests to another site on behalf of a user.
+## Table of Contents
 
-How Does It Work?
-When a web application makes a request to a resource on a different origin (domain, protocol, or port), the browser checks whether the target server allows the request.
+- [Overview](#overview)
+- [Tech Stack](#tech-stack)
+- [Architecture](#architecture)
+- [How WebRTC Connection Works](#how-webrtc-connection-works)
+- [Authentication Flow](#authentication-flow)
+- [CORS](#cors)
+- [Project Structure](#project-structure)
+- [Getting Started](#getting-started)
+- [Environment Variables](#environment-variables)
+- [Running Locally](#running-locally)
+- [Contributing](#contributing)
+- [License](#license)
 
-This is done by the server sending specific HTTP headers in its response. These headers define what types of requests are permitted from different origins.
+---
 
-Example
+## Overview
 
-Imagine you have a web application hosted on delta.com, and it needs to make a request to an API hosted on zoom.delta.com.
+Connect allows users to register, log in, and start real-time video calls with other users directly from the browser. It uses WebRTC for peer-to-peer audio/video streaming, a Socket.io signaling server to exchange connection metadata between peers, and JWT-based authentication to secure user sessions.
 
-By default, the browser blocks this request due to the Same-Origin Policy.
+---
 
-However, if the API server includes the appropriate CORS header in its response, such as:
+## Tech Stack
 
-Access-Control-Allow-Origin: delta.com
+### Frontend
+- React
+- Material UI
+- WebRTC
+- Axios
+- CSS
 
-then the browser will allow the request to proceed.
+### Backend
+- Express.js
+- Socket.io
+- Bcrypt
+- Crypto
 
-Important CORS Headers
-1. Access-Control-Allow-Origin
+### Database
+- MongoDB
 
-Specifies which origins are allowed to access the resource.
-It can be a specific origin or a wildcard (*), which allows any origin.
+---
 
-2. Access-Control-Allow-Methods
+## Architecture
+```
+                    ┌───────────────────────┐
+                    │        Client A       │
+                    │  (React + WebRTC)     │
+                    └───────────┬───────────┘
+                                │
+                 Signaling (Socket.io)  │  Peer-to-Peer Media (WebRTC)
+                                │                  │
+                    ┌───────────▼───────────┐      │
+                    │      Backend Server   │      │
+                    │Express.js + Socket.io │      │
+                    │  Auth (JWT, Bcrypt)   │      │
+                    └───────────┬───────────┘      │
+                                │                  │
+                    ┌───────────▼───────────┐      │
+                    │        MongoDB        │      │
+                    │   Users / Sessions    │      │
+                    └───────────┬───────────┘      │
+                                │                  │
+                    ┌───────────▼───────────┐      │
+                    │        Client B       │◄─────┘
+                    │  (React + WebRTC)     │
+                    └───────────────────────┘
+```
 
-Lists the HTTP methods that are permitted for cross-origin requests.
-Examples: GET, POST, PUT, DELETE
+The backend server handles authentication and acts as a signaling relay only. Once two clients have exchanged connection information through the server, audio and video data flows directly between them without passing through the backend.
 
-3. Access-Control-Allow-Headers
+---
 
-Specifies which HTTP headers can be used in the actual request.
+## How WebRTC Connection Works
 
-4. Access-Control-Allow-Credentials
+WebRTC enables direct browser-to-browser communication, but two peers first need a way to discover each other's network information. This is handled through a signaling and negotiation process:
 
-Indicates whether the request can include user credentials such as cookies or HTTP authentication.
+1. **Signaling** — Clients connect to the backend through Socket.io to exchange session information such as call requests and connection offers.
+2. **STUN Server** — A STUN server is a lightweight public server that returns the public IP address of the requesting device. This allows peers behind NAT/routers to discover how they can be reached.
+3. **Offer/Answer Exchange** — One peer creates a connection offer, sends it through the signaling server, and the other peer responds with an answer.
+4. **ICE Candidates** — Both peers exchange possible connection paths (ICE candidates) until a direct route is established.
+5. **Media Access** — The `navigator.mediaDevices` API is used to request access to the user's camera and microphone, returning a `MediaStream` that is attached to the peer connection.
 
-5. Access-Control-Expose-Headers
+Once the connection is established, video and audio flow directly between the two browsers, reducing latency and backend load.
 
-Specifies which response headers can be exposed to the browser.
+---
 
-Token in Authentication
+## Authentication Flow
 
-In authentication systems, a token is a piece of data that represents a user's credentials. It is used to verify the identity of a user or device trying to access a resource.
+Connect uses token-based authentication instead of maintaining server-side session state.
 
-Tokens are commonly used in stateless authentication systems, where the server does not maintain session information about the user between requests.
+1. **User Login** — The user submits credentials (email/username and password).
+2. **Password Verification** — Passwords are hashed using Bcrypt at registration and compared securely at login; Crypto is used for any additional token or randomness generation.
+3. **Token Generation** — On successful login, the server issues a signed token (JWT) containing user identity information.
+4. **Token Storage** — The client stores the token and attaches it to future requests.
+5. **Authenticated Requests** — Protected routes require the token to be sent in the request header:Authorization: Bearer <token>
+6. **Token Verification** — The server verifies the token's signature and expiry before granting access to protected resources.
 
-There are multiple types of tokens, such as:
+### JWT Structure
 
-Access Tokens
-Refresh Tokens
-ID Tokens
-How Are Tokens Used in the Authentication Flow?
-Step 1: User Login
+A JSON Web Token consists of three parts:
 
-The user provides their credentials (e.g., username and password) to authenticate with the server.
+| Part | Purpose |
+|------|---------|
+| Header | Metadata about the token, including the signing algorithm |
+| Payload | The actual claims/data, such as user ID |
+| Signature | Verifies the token has not been tampered with |
 
-Step 2: Token Generation
+---
 
-Upon successful authentication, the server generates a token and sends it back to the client.
+## CORS
 
-Step 3: Token Storage
+Cross-Origin Resource Sharing (CORS) is a browser security mechanism that restricts how a web application on one origin can request resources from a different origin. It prevents unauthorized cross-domain requests from being made on behalf of a user.
 
-The client stores the token, typically in local storage or a cookie.
+The backend explicitly allows the frontend's origin and defines which HTTP methods and headers are permitted, using headers such as:
 
-Step 4: Authenticated Requests
+| Header | Purpose |
+|--------|---------|
+| `Access-Control-Allow-Origin` | Specifies which origin(s) may access the resource |
+| `Access-Control-Allow-Methods` | Specifies which HTTP methods are permitted (GET, POST, PUT, DELETE) |
+| `Access-Control-Allow-Headers` | Specifies which request headers are permitted |
+| `Access-Control-Allow-Credentials` | Specifies whether cookies/credentials may be included in requests |
+| `Access-Control-Expose-Headers` | Specifies which response headers the browser may expose to client-side scripts |
 
-For subsequent requests, the client includes the token in the HTTP headers (usually in the Authorization header) to access protected resources.
+---
 
-Authorization: Bearer <token>
-Step 5: Token Verification
+## Project Structure
+```
+Connect/
+├── backend/
+│ ├── controllers/ # Route logic (auth, users, calls)
+│ ├── models/ # MongoDB schemas
+│ ├── routes/ # Express route definitions
+│ ├── middleware/ # Auth guards, error handling
+│ ├── socket/ # Socket.io signaling logic
+│ └── server.js # Entry point
+│
+├── frontend/
+│ ├── src/
+│ │ ├── components/ # Reusable UI components
+│ │ ├── pages/ # Page-level views
+│ │ ├── context/ # Auth/socket context providers
+│ │ ├── services/ # Axios API calls
+│ │ └── App.js
+│ └── public/
+│
+└── README.md
+```
 
-The server verifies the token to ensure that the request is authenticated and authorized.
+---
 
-JSON Web Token (JWT)
+## Getting Started
 
-A well-known example of token-based authentication is JWT (JSON Web Token).
+### Prerequisites
 
-JWTs are:
+- Node.js and npm installed
+- A running MongoDB instance (local or cloud, e.g. MongoDB Atlas)
 
-Compact
-URL-safe
-Easy to parse and validate
+---
 
-A JWT consists of three parts:
+## Environment Variables
 
-Header – Contains metadata about the token (e.g., signing algorithm)
-Payload – Contains the actual data (e.g., user information)
-Signature – Used to verify the authenticity of the token
+Create a `.env` file inside the `backend/` directory:
 
-STUN servers are lightweight servers running on the public internet which return the IP adress of the requester's device.
+```env
+PORT=
+MONGO_URI=
+JWT_SECRET=
+CLIENT_URL=
+```
 
-The Navigator interface represents the state and the identity of the user agent. It allows scripts to query it and to register themselves to carry on some activities.
-A Navigator object can be retrieved using the read-only window.navigator property.
+---
 
-The mediaDevices read-only property of the Navigator interface returns a MediaDevices object, which provides access to connected media input devices like cameras and microphones, as well as screen sharing.
+## Running Locally
+
+```bash
+# Backend
+cd backend
+npm install
+npm start
+
+# Frontend (in a separate terminal)
+cd frontend
+npm install
+npm start
+```
+
+The frontend will typically run on `http://localhost:3000` and the backend on the port specified in your `.env` file.
+
+---
+
+## Contributing
+
+Contributions are welcome. Please open an issue to discuss significant changes before submitting a pull request.
+
+1. Fork the repository
+2. Create a feature branch (`git checkout -b feature/your-feature`)
+3. Commit your changes
+4. Open a pull request
+
+---
+
+## License
+
+MIT License — see [LICENSE](LICENSE) for details.
