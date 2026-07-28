@@ -1,10 +1,11 @@
-import React from 'react'
+import React, { useState } from 'react'
 import "../App.css"
 import { Link, useNavigate } from 'react-router-dom'
+
 export default function LandingPage() {
 
-    
     const router = useNavigate();
+    const [navOpen, setNavOpen] = useState(false);
 
     return (
         <div className='landingPageContainer'>
@@ -12,23 +13,36 @@ export default function LandingPage() {
                 <div className='navHeader'>
                     <h2>Apna Video Call</h2>
                 </div>
-                <div className='navlist'>
+
+                {/* Hamburger toggle — visible only on small screens via CSS */}
+                <button
+                    className='navToggle'
+                    aria-label="Toggle navigation"
+                    aria-expanded={navOpen}
+                    onClick={() => setNavOpen(prev => !prev)}
+                >
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                </button>
+
+                <div className={`navlist${navOpen ? ' navOpen' : ''}`}>
                     <p onClick={() => {
                         router("/aljk23")
+                        setNavOpen(false)
                     }}>Join as Guest</p>
                     <p onClick={() => {
                         router("/auth")
-
+                        setNavOpen(false)
                     }}>Register</p>
                     <div onClick={() => {
                         router("/auth")
-
+                        setNavOpen(false)
                     }} role='button'>
                         <p>Login</p>
                     </div>
                 </div>
             </nav>
-
 
             <div className="landingMainContainer">
                 <div>
@@ -40,9 +54,7 @@ export default function LandingPage() {
                     </div>
                 </div>
                 <div>
-
-                    <img src="/mobile.png" alt="" />
-
+                    <img src="/mobile.png" alt="App preview on mobile" />
                 </div>
             </div>
         </div>
