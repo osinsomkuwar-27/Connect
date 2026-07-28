@@ -13,8 +13,6 @@ import StopScreenShareIcon from '@mui/icons-material/StopScreenShare'
 import ChatIcon from '@mui/icons-material/Chat'
 import server from '../environment';
 
-const server = import.meta.env.VITE_SERVER_URL;
-
 var connections = {};
 
 const peerConfigConnections = {
@@ -265,7 +263,7 @@ export default function VideoMeetComponent() {
 
 
     let connectToSocketServer = () => {
-        socketRef.current = io.connect(server_url, { secure: false })
+        socketRef.current = io.connect(server, { secure: false })
 
         socketRef.current.on('signal', gotMessageFromServer)
 
@@ -521,7 +519,7 @@ export default function VideoMeetComponent() {
                                 {screen === true ? <ScreenShareIcon /> : <StopScreenShareIcon />}
                             </IconButton> : <></>}
 
-                        <Badge badgeContent={newMessages} max={999} color='orange'>
+                        <Badge badgeContent={newMessages} max={999} color='warning'>
                             <IconButton onClick={() => setModal(!showModal)} style={{ color: "white" }}>
                                 <ChatIcon />                        </IconButton>
                         </Badge>
