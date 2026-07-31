@@ -32,10 +32,7 @@ export default function Authentication() {
     let handleAuth = async () => {
         try {
             if (formState === 0) {
-
-                let result = await handleLogin(username, password)
-
-
+                await handleLogin(username, password);
             }
             if (formState === 1) {
                 let result = await handleRegister(name, username, password);
